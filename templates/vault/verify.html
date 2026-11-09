@@ -1,0 +1,33 @@
+{% extends "base.html" %}{% load sceau_tags %}{% block title %}Vérification{% endblock %}
+{% block content %}
+<div class="lb">Vérification · {{ record.filename }}</div>
+{% if verification %}
+{% if verification.result == "identical" %}
+<h1 class="verdict ok">Ce fichier est identique à l'original.</h1>
+<p class="lead">Son empreinte correspond exactement à celle enregistrée le {{ record.created_at|date:"j F Y" }}. Rien n'a changé, pas un octet.</p>
+{% else %}
+<h1 class="verdict ko">Ce fichier a changé depuis le {{ record.created_at|date:"j F" }}.</h1>
+<p class="lead">Son empreinte ne correspond plus à celle enregistrée. Ne le transmettez pas comme s'il s'agissait de l'original.</p>
+{% endif %}
+<div class="cmp"><div><div class="lb">Empreinte enregistrée le {{ record.created_at|date:"j M" }} · SHA-256</div><div class="hx">{{ record.sha256|hash_groups }}</div></div>
+<div><div class="lb">Empreinte du fichier déposé · SHA-256</div><div class="hx">{% diff_hash verification.observed_sha256 record.sha256 %}</div></div></div>
+<div class="note">{% if verification.result == "identical" %}
+<div><b>Ce que cela prouve</b>Le fichier est identique à celui que vous aviez enregistré.</div>
+<div><b>Ce que cela ne dit pas</b>Que ce fichier était fiable au départ, ni qui l'a écrit. Pour prouver l'origine, émettez un certificat.</div>
+{% else %}
+<div><b>Ce que cela prouve</b>Les deux empreintes sont différentes : les fichiers ne sont pas identiques, au moindre octet près.</div>
+<div><b>Ce que cela ne dit pas</b>Où ni pourquoi le fichier a changé. Une simple ouverture suivie d'un réenregistrement suffit parfois.</div>
+{% endif %}</div>
+<div class="row">{% if verification.result == "identical" %}<form method="post" action="{% url 'certify' record.pk %}">{% csrf_token %}<button class="bt" type="submit">Émettre un certificat</button></form>{% endif %}
+<a class="bt s" href="{% url 'vault_verify' record.pk %}">Vérifier un autre fichier</a><a href="{% url 'vault_list' %}">Retour au coffre</a></div>
+{% else %}
+<h1>Vérifier un fichier</h1>
+<p class="lead">Déposez le fichier à comparer à la référence « {{ record.filename }} ». Il est lu puis oublié : seule son empreinte est calculée.</p>
+<form method="post" enctype="multipart/form-data" class="dz" data-busy>{% csrf_token %}
+<div>Glissez le fichier ici<span>ou cliquez pour le choisir</span><span class="chosen" data-chosen></span></div>
+<input type="file" name="file" required aria-label="Choisir un fichier">
+<button class="bt" type="submit">Vérifier</button></form>
+{% if error %}<p class="err" role="alert">▲ {{ error }}</p>{% endif %}
+<p><a href="{% url 'vault_list' %}">Retour au coffre</a></p>
+{% endif %}
+{% endblock %}

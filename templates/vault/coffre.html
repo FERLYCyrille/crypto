@@ -1,0 +1,18 @@
+{% extends "base.html" %}{% load sceau_tags %}{% block title %}Coffre{% endblock %}
+{% block content %}
+<h1>Votre coffre</h1>
+<p class="lead">Déposez un fichier pour en garder l'empreinte. Seule l'empreinte est conservée, jamais le fichier. Premier passage ? <a href="{% url 'guide' %}">Lisez le guide</a>.</p>
+<form method="post" enctype="multipart/form-data" class="dz" data-busy>{% csrf_token %}
+<div>Glissez un fichier ici<span>ou cliquez pour le choisir</span><span class="chosen" data-chosen></span></div>
+<input type="file" name="file" required aria-label="Choisir un fichier">
+<button class="bt" type="submit">Enregistrer un fichier</button></form>
+{% if error %}<p class="err" role="alert">▲ {{ error }}</p>{% endif %}
+<h2>Empreintes enregistrées</h2>
+{% if records %}<div class="scroll"><table><thead><tr><th>Fichier</th><th class="hide-sm">Empreinte SHA-256</th><th>Enregistré</th><th>État</th><th></th></tr></thead><tbody>
+{% for r in records %}<tr><td>{{ r.filename }}</td><td class="m hide-sm">{{ r.sha256|short_hash }}</td><td>{{ r.created_at|date:"j M Y" }}</td>
+<td>{% if r.last_result == "identical" %}<span class="ok">● Intact</span>{% elif r.last_result == "modified" %}<span class="ko">▲ Modifié</span>{% else %}<span class="muted">○ Jamais vérifié</span>{% endif %}</td>
+<td><a href="{% url 'vault_verify' r.pk %}">Vérifier</a>
+<form method="post" action="{% url 'certify' r.pk %}" class="inline">{% csrf_token %}<button class="linkbtn">Certifier</button></form></td></tr>{% endfor %}
+</tbody></table></div>
+{% else %}<p class="muted">Aucune empreinte pour l'instant. Déposez un premier fichier ci-dessus.</p>{% endif %}
+{% endblock %}
