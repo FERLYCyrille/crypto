@@ -1,0 +1,5 @@
+{% extends "base.html" %}{% block title %}Certificats{% endblock %}
+{% block content %}<h1>Vos certificats</h1><p class="lead">Les certificats que vous avez émis. Pour en créer un, choisissez « Certifier » dans votre coffre.</p>
+{% if certs %}<div class="scroll"><table><thead><tr><th>Numéro</th><th>Fichier</th><th>Émis le</th><th></th></tr></thead><tbody>
+{% for c in certs %}<tr><td class="m">{{ c.serial }}</td><td>{{ c.document.payload.filename }}</td><td>{{ c.issued_at|date:"j M Y" }}</td><td><a href="{% url 'certificate_detail' c.pk %}">Ouvrir</a> · <a href="{% url 'certificate_download' c.pk %}">Télécharger</a></td></tr>{% endfor %}
+</tbody></table></div>{% else %}<p class="muted">Aucun certificat pour l'instant.</p>{% endif %}{% endblock %}

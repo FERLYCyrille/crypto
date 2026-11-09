@@ -1,0 +1,23 @@
+# Environnement
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Base de données
+*.sqlite3
+
+# Secrets et clés privées
+keys/
+vault/
+*.pem
+*.key
+
+# IDE
+.vscode/
+.idea/

@@ -1,0 +1,11 @@
+{% extends "base.html" %}{% block title %}Certificat {{ cert.serial }}{% endblock %}
+{% block content %}<div class="two">
+<div class="paper"><div class="row" style="justify-content:space-between"><span class="lb" style="margin:0">N° {{ cert.serial }}</span>{% include "_seal.html" %}</div>
+<h1 style="margin-top:20px">Certificat d'intégrité</h1>
+<dl class="kv"><dt>Fichier</dt><dd>{{ payload.filename }}</dd><dt>Taille</dt><dd>{{ payload.size }} octets</dd><dt>Émis par</dt><dd>{{ payload.issuer }}</dd>
+<dt>Date</dt><dd>{{ cert.issued_at|date:"j F Y, H:i" }} UTC</dd><dt>Algorithme</dt><dd>SHA-256</dd><dt>Empreinte</dt><dd class="m" style="font-size:14px">{{ payload.sha256 }}</dd></dl>
+<div style="border-top:1px solid var(--line);padding-top:20px"><div class="lb">Signature Ed25519 · clé {{ cert.key_id }}</div><div class="m" style="font-size:13px;word-break:break-all;color:var(--soft)">{{ cert.document.signature }}</div></div></div>
+<div><h2 style="margin-top:0">Envoyer ce certificat</h2><p class="lead">Envoyez-le avec votre fichier. Votre destinataire n'a pas besoin de compte pour vérifier.</p>
+<div class="row" style="flex-direction:column;align-items:stretch"><a class="bt" href="{% url 'certificate_download' cert.pk %}">Télécharger le certificat</a>
+<button class="bt s" type="button" data-copy="{{ verify_url }}">Copier le lien de vérification</button></div>
+<ol class="muted" style="margin:32px 0 0;padding-left:20px;line-height:1.7"><li>Vous envoyez le fichier et le certificat.</li><li>Il les dépose sur la page de vérification.</li><li>Sceau confirme l'origine et l'intégrité.</li></ol></div></div>{% endblock %}

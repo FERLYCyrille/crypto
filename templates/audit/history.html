@@ -1,0 +1,6 @@
+{% extends "base.html" %}{% block title %}Historique{% endblock %}
+{% block content %}<h1>Historique</h1><p class="lead">Toutes les opérations de votre compte, de la plus récente à la plus ancienne.</p>
+{% if events %}<div class="evs">{% for e in events %}<div class="ev"><span class="muted">{{ e.created_at|date:"j M · H:i" }}</span>
+<b>{% if e.type == "verification" %}{% if e.details.result == "identical" %}<span class="ok">● Vérification : intact</span>{% else %}<span class="ko">▲ Vérification : modifié</span>{% endif %}{% elif e.type == "certificate_issued" %}Certificat émis{% else %}Enregistrement{% endif %}</b>
+<span>{{ e.filename }}{% if e.details.serial %} · {{ e.details.serial }}{% endif %}</span></div>{% endfor %}</div>
+{% else %}<p class="muted">Aucune opération pour l'instant.</p>{% endif %}{% endblock %}

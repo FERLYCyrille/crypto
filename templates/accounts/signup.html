@@ -1,0 +1,9 @@
+{% extends "base.html" %}{% block title %}Inscription{% endblock %}
+{% block body %}<div class="split"><div class="pitch"><a class="brand" href="/">{% include "_seal.html" %}Sceau</a>
+<div><h1>Créez votre coffre d'empreintes.</h1><p class="lead" style="margin-top:20px">Votre nom affiché figurera sur les certificats que vous émettez. Vos fichiers ne sont jamais conservés.</p></div>
+<span class="lb">Projet de cryptographie appliquée</span></div>
+<div class="formcol"><form method="post" class="stack">{% csrf_token %}<h2 style="margin:0">Inscription</h2>
+{% for field in form %}{% for e in field.errors %}<p class="err" role="alert">▲ {{ e }}</p>{% endfor %}{% endfor %}{{ form.non_field_errors }}
+{% for field in form %}<label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% endfor %}
+<button class="bt" type="submit">Créer mon compte</button>
+<span class="muted" style="font-size:14px">Déjà un compte ? <a href="{% url 'login' %}">Se connecter</a></span></form></div></div>{% endblock %}

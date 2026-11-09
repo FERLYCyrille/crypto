@@ -1,0 +1,21 @@
+{% extends "base.html" %}{% block title %}Vérifier un fichier reçu{% endblock %}
+{% block content %}<div style="max-width:760px;margin:0 auto">
+<h1>Vérifier un fichier reçu</h1><p class="lead">Déposez le fichier et son certificat. Aucun compte requis, et le fichier n'est pas conservé.</p>
+<form method="post" enctype="multipart/form-data" data-busy>{% csrf_token %}
+<div class="drops"><div class="dz" style="padding:20px;font-size:16px"><div>Fichier reçu<span>Cliquez ou glissez-le ici</span><span class="chosen" data-chosen></span></div><input type="file" name="file" required aria-label="Fichier reçu"></div>
+<div class="dz" style="padding:20px;font-size:16px"><div>Certificat (.json)<span>Cliquez ou glissez-le ici</span><span class="chosen" data-chosen></span></div><input type="file" name="certificate" required aria-label="Certificat"></div></div>
+<button class="bt" type="submit">Vérifier</button></form>
+{% if error %}<p class="err" role="alert">▲ {{ error }}</p>{% endif %}
+{% if result %}
+{% if result.verdict == "intact" %}<div class="panel good"><div class="ok"><b>Vérifié</b></div>
+<h2 style="margin:12px 0 8px;font-size:30px">Fichier intact, certifié par {{ result.payload.issuer }}.</h2>
+{% elif result.verdict == "modified" %}<div class="panel warn"><div><b>Attention</b></div>
+<h2 style="margin:12px 0 8px;font-size:30px">Certificat authentique, mais le fichier a été modifié.</h2>
+{% else %}<div class="panel bad"><div class="ko"><b>▲ Non vérifié</b></div>
+<h2 class="ko" style="margin:12px 0 8px;font-size:30px">Ce certificat n'est pas authentique.</h2>
+<p>{{ result.reason }} N'accordez pas de confiance à ce fichier.</p>{% endif %}
+{% if result.payload %}<p class="muted">Certifié le {% if issued_at %}{{ issued_at|date:"j F Y à H:i" }} UTC{% else %}{{ result.payload.issued_at }}{% endif %} · n° {{ result.payload.serial }}</p>
+<ul class="checks"><li>● Signature du certificat valide</li><li>{% if result.verdict == "intact" %}● Empreinte du fichier identique à celle certifiée{% else %}▲ Empreinte du fichier différente de celle certifiée{% endif %}</li><li>● Certificat émis par Sceau (clé {{ result.payload.key_id }})</li></ul>
+<p class="muted" style="font-size:14px">Cela atteste que ce compte a certifié ce fichier, pas qu'il en est l'auteur. <a href="{% url 'public_key' %}">Clé publique de vérification</a></p>
+<details><summary>Voir les détails techniques</summary><pre>{{ result.payload }}</pre></details>{% endif %}
+</div>{% endif %}</div>{% endblock %}

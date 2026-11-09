@@ -1,0 +1,61 @@
+{% extends "base.html" %}{% block title %}Guide d'utilisation{% endblock %}
+{% block content %}<div class="guide">
+<h1>Guide d'utilisation</h1>
+<p class="lead">Tout ce qu'il faut savoir pour utiliser Sceau, en quelques minutes.</p>
+<nav class="toc" aria-label="Sommaire"><a href="#principe">Le principe</a><a href="#vocabulaire">Les mots clés</a><a href="#enregistrer">Enregistrer</a><a href="#verifier">Vérifier</a><a href="#certifier">Certifier</a><a href="#destinataire">Si vous recevez un fichier</a><a href="#limites">Garanties et limites</a><a href="#faq">Questions fréquentes</a></nav>
+
+<h2 id="principe">Le principe</h2>
+<p>Sceau répond à deux questions : <b>« Ce fichier a-t-il changé depuis que je l'ai enregistré ? »</b> et <b>« Comment prouver à quelqu'un que ce fichier est bien celui que j'ai remis, sans modification ? »</b></p>
+<p>Pour cela, Sceau ne garde jamais vos fichiers. Il en calcule une <em>empreinte</em>, qu'il peut comparer plus tard, et il peut émettre un <em>certificat signé</em> que votre destinataire vérifie lui-même.</p>
+
+<h2 id="vocabulaire">Les mots clés</h2>
+<dl class="defs">
+<div><dt>Empreinte</dt><dd>Une suite de caractères calculée à partir du contenu d'un fichier. Si un seul octet change, l'empreinte change complètement.</dd></div>
+<div><dt>Référence</dt><dd>L'empreinte d'un fichier enregistrée dans votre coffre, avec son nom, sa taille et la date. C'est tout ce que Sceau conserve.</dd></div>
+<div><dt>Certificat</dt><dd>Un petit fichier signé par Sceau qui atteste : « ce compte a enregistré ce fichier, avec cette empreinte, à cette date ».</dd></div>
+<div><dt>Signature</dt><dd>Elle garantit que le certificat n'a pas été fabriqué ni modifié. Elle se vérifie avec la <a href="{% url 'public_key' %}">clé publique</a> de Sceau.</dd></div>
+</dl>
+
+<h2 id="enregistrer">1. Enregistrer un fichier</h2>
+<ol class="steps">
+<li><div><b>Créez votre compte</b>Le nom que vous donnez à l'inscription figurera sur vos certificats.</div></li>
+<li><div><b>Ouvrez le Coffre</b>Glissez un fichier dans la zone en pointillés, ou cliquez dessus pour le choisir. Taille maximale : {{ max_mb }} Mo.</div></li>
+<li><div><b>Retrouvez-le dans la liste</b>Votre fichier apparaît avec son empreinte abrégée. Le fichier lui-même n'est pas conservé : gardez votre copie en lieu sûr.</div></li>
+</ol>
+
+<h2 id="verifier">2. Vérifier un fichier plus tard</h2>
+<ol class="steps">
+<li><div><b>Cliquez sur « Vérifier »</b>Sur la ligne du fichier, dans votre coffre.</div></li>
+<li><div><b>Déposez le fichier à comparer</b>C'est la copie que vous voulez contrôler.</div></li>
+<li><div><b>Lisez le verdict</b>Sceau compare les deux empreintes. En cas de différence, les caractères qui diffèrent sont surlignés.</div></li>
+</ol>
+<p>L'état de chaque fichier est rappelé dans votre coffre :</p>
+<ul class="legend"><li><span class="ok">● Intact</span> : la dernière vérification a trouvé un fichier identique.</li><li><span class="ko">▲ Modifié</span> : la dernière vérification a trouvé un fichier différent.</li><li><span class="muted">○ Jamais vérifié</span> : vous n'avez pas encore comparé ce fichier.</li></ul>
+<div class="callout"><p>Seul le <b>contenu</b> compte. Renommer un fichier ne change pas son empreinte.</p></div>
+
+<h2 id="certifier">3. Certifier et envoyer un fichier</h2>
+<ol class="steps">
+<li><div><b>Cliquez sur « Certifier »</b>Dans votre coffre, sur la ligne du fichier (ou après une vérification réussie).</div></li>
+<li><div><b>Téléchargez le certificat</b>Sur la page du certificat, un bouton vous donne un fichier <code>.json</code>.</div></li>
+<li><div><b>Envoyez les deux</b>Transmettez le fichier <em>et</em> son certificat à votre destinataire, par e-mail ou messagerie. Vous pouvez aussi lui envoyer le lien de la page de vérification.</div></li>
+</ol>
+
+<h2 id="destinataire">Si vous recevez un fichier avec un certificat</h2>
+<p>Pas besoin de compte. Ouvrez <a href="{% url 'public_verify' %}">Vérifier un certificat</a>, déposez le fichier reçu et son certificat. Trois résultats sont possibles :</p>
+<ul class="legend"><li><b class="ok">Fichier intact, certifié par…</b> : le fichier est identique à celui certifié et le certificat est authentique.</li><li><b>Certificat authentique, mais le fichier a été modifié</b> : le certificat est bon, mais ce fichier n'est plus celui qui a été certifié.</li><li><b class="ko">Ce certificat n'est pas authentique</b> : il a été modifié, fabriqué, ou illisible. Ne faites pas confiance à ce fichier.</li></ul>
+
+<h2 id="limites">Garanties et limites</h2>
+<p><b>Sceau garantit</b> que le fichier est identique, octet pour octet, à celui qui a été enregistré ou certifié, et qu'un certificat n'a pas été falsifié.</p>
+<p><b>Sceau ne garantit pas</b> que le contenu est vrai ou sûr, ni que la personne a écrit le fichier : un certificat atteste seulement que <em>ce compte</em> l'a enregistré à cette date. Un certificat ne peut pas être révoqué dans cette version, et Sceau ne remplace pas une signature électronique à valeur légale.</p>
+
+<h2 id="faq">Questions fréquentes</h2>
+<div class="faq">
+<details><summary>J'ai ouvert puis réenregistré mon document : pourquoi est-il « modifié » ?</summary><p>De nombreux logiciels réécrivent des informations internes (date, métadonnées) même sans changement visible. Pour Sceau, c'est un fichier différent. Conservez l'original intact et ne l'ouvrez qu'en lecture.</p></details>
+<details><summary>Mon fichier est-il conservé ?</summary><p>Il est transmis à Sceau le temps du calcul, puis supprimé. Seuls l'empreinte, le nom et la taille sont gardés.</p></details>
+<details><summary>Quelle est la taille maximale ?</summary><p>{{ max_mb }} Mo par fichier.</p></details>
+<details><summary>Que faire si un certificat est déclaré non authentique ?</summary><p>Ne faites pas confiance au fichier. Demandez à l'expéditeur de vous renvoyer le fichier et un certificat téléchargé depuis son compte.</p></details>
+<details><summary>Qui voit mes fichiers et mes certificats ?</summary><p>Vous seul voyez votre coffre, votre historique et votre liste de certificats. Un destinataire voit uniquement les informations contenues dans le certificat que vous lui envoyez.</p></details>
+</div>
+
+<div class="row" style="margin-top:48px">{% if user.is_authenticated %}<a class="bt" href="{% url 'vault_list' %}">Aller au coffre</a>{% else %}<a class="bt" href="{% url 'signup' %}">Créer un compte</a><a class="bt s" href="{% url 'login' %}">Se connecter</a>{% endif %}</div>
+</div>{% endblock %}

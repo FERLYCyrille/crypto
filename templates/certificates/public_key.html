@@ -1,0 +1,4 @@
+{% extends "base.html" %}{% block title %}Clé publique{% endblock %}
+{% block content %}<h1>Clé publique de vérification</h1>
+<p class="lead">Cette clé permet à n'importe qui de vérifier qu'un certificat a bien été signé par Sceau. Elle ne permet pas de signer.</p>
+<dl class="kv"><dt>Identifiant</dt><dd class="m">{{ key_id }}</dd><dt>Algorithme</dt><dd>Ed25519</dd><dt>Empreinte</dt><dd class="m">{{ fingerprint }}</dd></dl><pre>{{ pem }}</pre>{% endblock %}

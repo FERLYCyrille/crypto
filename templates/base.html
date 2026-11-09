@@ -1,0 +1,30 @@
+{% load static sceau_tags %}<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<script>document.documentElement.className='js'</script>
+<title>{% block title %}Sceau{% endblock %} · Sceau</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/sceau.css' %}"></head>
+<body>
+{% block body %}
+<header class="nav"><a class="brand" href="/">{% include "_seal.html" %}Sceau</a>
+<button class="burger" type="button" aria-expanded="false" aria-controls="menu" aria-label="Ouvrir le menu">
+<svg class="i-open" width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><path d="M3 6h16M3 11h16M3 16h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+<svg class="i-close" width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><path d="M5 5l12 12M17 5L5 17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+<div class="menu" id="menu"><nav class="links" aria-label="Navigation principale">
+{% if user.is_authenticated %}
+<a href="{% url 'vault_list' %}"{% if section == 'coffre' %} class="on" aria-current="page"{% endif %}>Coffre</a>
+<a href="{% url 'certificate_list' %}"{% if section == 'certificats' %} class="on" aria-current="page"{% endif %}>Certificats</a>
+<a href="{% url 'history' %}"{% if section == 'historique' %} class="on" aria-current="page"{% endif %}>Historique</a>
+{% endif %}
+<a href="{% url 'public_verify' %}"{% if section == 'verifier' %} class="on" aria-current="page"{% endif %}>Vérifier un certificat</a>
+<a href="{% url 'guide' %}"{% if section == 'guide' %} class="on" aria-current="page"{% endif %}>Guide</a>
+</nav>
+<div class="account">{% if user.is_authenticated %}<span class="av" title="{{ user.username }}">{{ user|initials }}</span>
+<span class="who"><b>{{ user.get_full_name|default:user.username }}</b><span>{{ user.username }}</span></span>
+<form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="linkbtn">Se déconnecter</button></form>
+{% else %}<a class="login" href="{% url 'login' %}">Connexion</a>{% endif %}</div></div></header>
+{% if messages %}<div class="c msgs">{% for m in messages %}{% if "guide" in m.extra_tags %}<p class="msg guide-hint" role="status">Nouveau ici ? <a href="{% url 'guide' %}">Jetez un œil au guide</a> pour mieux comprendre comment utiliser Sceau.</p>{% else %}<p class="msg" role="status">{{ m }}</p>{% endif %}{% endfor %}</div>{% endif %}
+<main class="c">{% block content %}{% endblock %}</main>
+{% endblock %}
+<script src="{% static 'js/sceau.js' %}" defer></script></body></html>

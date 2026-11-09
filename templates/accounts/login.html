@@ -1,0 +1,11 @@
+{% extends "base.html" %}{% block title %}Connexion{% endblock %}
+{% block body %}<div class="split"><div class="pitch"><a class="brand" href="/">{% include "_seal.html" %}Sceau</a>
+<div><h1>La preuve qu'un fichier n'a pas bougé.</h1><p class="lead" style="margin-top:20px">Enregistrez l'empreinte de vos fichiers, certifiez-les, et laissez vos destinataires vérifier par eux-mêmes.</p></div>
+<span class="lb">Projet de cryptographie appliquée</span></div>
+<div class="formcol"><form method="post" class="stack">{% csrf_token %}<h2 style="margin:0">Connexion</h2>
+{% if form.errors %}<p class="err" role="alert">▲ E-mail ou mot de passe incorrect.</p>{% endif %}
+<label for="{{ form.username.id_for_label }}">E-mail</label>{{ form.username }}
+<label for="{{ form.password.id_for_label }}">Mot de passe</label>{{ form.password }}
+<input type="hidden" name="next" value="{{ next }}">
+<button class="bt" type="submit">Se connecter</button>
+<span class="muted" style="font-size:14px">Pas encore de compte ? <a href="{% url 'signup' %}">Créer un compte</a> · <a href="{% url 'public_verify' %}">Vérifier un certificat reçu</a></span></form></div></div>{% endblock %}
